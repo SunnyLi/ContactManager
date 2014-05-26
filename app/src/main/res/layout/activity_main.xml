@@ -5,60 +5,99 @@
     tools:context="li.sunny.contactmanager.app.MainActivity"
     android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Contact Creator"
-        android:id="@+id/lblCreatorTitle"
-        android:layout_gravity="center"
-        android:layout_marginTop="15px" />
-
-    <EditText
+    <TabHost
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:inputType="textPersonName"
-        android:ems="10"
-        android:id="@+id/txtName"
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:hint="Contact Name" />
+        android:id="@+id/tabHost">
 
-    <EditText
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:inputType="phone"
-        android:ems="10"
-        android:id="@+id/txtPhone"
-        android:layout_marginTop="15dp"
-        android:layout_gravity="center"
-        android:hint="Phone Number" />
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:orientation="vertical">
 
-    <EditText
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textEmailAddress"
-        android:ems="10"
-        android:id="@+id/txtEmail"
-        android:layout_marginTop="15dp"
-        android:layout_gravity="center"
-        android:hint="Email" />
+            <TabWidget
+                android:id="@android:id/tabs"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"></TabWidget>
 
-    <EditText
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPostalAddress"
-        android:ems="10"
-        android:id="@+id/txtAddress"
-        android:layout_marginTop="15dp"
-        android:layout_gravity="center"
-        android:hint="Address" />
+            <FrameLayout
+                android:id="@android:id/tabcontent"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
 
-    <Button
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:text="Add Contact"
-        android:id="@+id/btnAdd"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp" />
+                <LinearLayout
+                    android:id="@+id/tabCreator"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="?android:attr/textAppearanceLarge"
+                        android:text="Contact Creator"
+                        android:id="@+id/lblCreatorTitle"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="15px" />
+
+                    <EditText
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName"
+                        android:ems="10"
+                        android:id="@+id/txtName"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="20dp"
+                        android:hint="Contact Name" />
+
+                    <EditText
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="phone"
+                        android:ems="10"
+                        android:id="@+id/txtPhone"
+                        android:layout_marginTop="15dp"
+                        android:layout_gravity="center"
+                        android:hint="Phone Number" />
+
+                    <EditText
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textEmailAddress"
+                        android:ems="10"
+                        android:id="@+id/txtEmail"
+                        android:layout_marginTop="15dp"
+                        android:layout_gravity="center"
+                        android:hint="Email" />
+
+                    <EditText
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPostalAddress"
+                        android:ems="10"
+                        android:id="@+id/txtAddress"
+                        android:layout_marginTop="15dp"
+                        android:layout_gravity="center"
+                        android:hint="Address" />
+
+                    <Button
+                        android:layout_width="200dp"
+                        android:layout_height="wrap_content"
+                        android:text="Add Contact"
+                        android:id="@+id/btnAdd"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp"
+                        android:enabled="false" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/tabContactList"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:orientation="vertical"></LinearLayout>
+
+            </FrameLayout>
+        </LinearLayout>
+    </TabHost>
+
 </LinearLayout>
