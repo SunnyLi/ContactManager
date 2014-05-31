@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +24,7 @@ public class MainActivity extends ActionBarActivity {
 
     EditText nameTxt, phoneTxt, emailTxt, addressTxt;
     List<Contact> Contacts = new ArrayList<Contact>() ;
+    ListView contactListView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +35,7 @@ public class MainActivity extends ActionBarActivity {
         phoneTxt = (EditText) findViewById(R.id.txtPhone);
         emailTxt = (EditText) findViewById(R.id.txtEmail);
         addressTxt = (EditText) findViewById(R.id.txtAddress);
+        contactListView = (ListView) findViewById(R.id.listView);
         TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
 
         tabHost.setup();
@@ -52,6 +55,7 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onClick(View view) {
                 addContact(nameTxt.getText().toString(), phoneTxt.getText().toString(), emailTxt.getText().toString(), addressTxt.getText().toString());
+                populateList();
                 Toast.makeText(getApplicationContext(), nameTxt.getText().toString() + " has been added to your Contacts!", Toast.LENGTH_SHORT).show();
             }
         });
@@ -72,6 +76,11 @@ public class MainActivity extends ActionBarActivity {
 
             }
         });
+    }
+
+    private void populateList() {
+        ArrayAdapter<Contact> adapter = new ContactListAdapter();
+        contactListView.setAdapter(adapter);
     }
 
     private void addContact(String name, String phone, String email, String address) {
