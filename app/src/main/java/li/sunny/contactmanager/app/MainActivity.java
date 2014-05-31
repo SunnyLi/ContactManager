@@ -1,5 +1,6 @@
 package li.sunny.contactmanager.app;
 
+import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
@@ -11,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TabHost;
 import android.widget.TextView;
@@ -23,6 +25,7 @@ import java.util.List;
 public class MainActivity extends ActionBarActivity {
 
     EditText nameTxt, phoneTxt, emailTxt, addressTxt;
+    ImageView contactImageImgView;
     List<Contact> Contacts = new ArrayList<Contact>() ;
     ListView contactListView;
 
@@ -36,8 +39,9 @@ public class MainActivity extends ActionBarActivity {
         emailTxt = (EditText) findViewById(R.id.txtEmail);
         addressTxt = (EditText) findViewById(R.id.txtAddress);
         contactListView = (ListView) findViewById(R.id.listView);
-        TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
+        contactImageImgView = (ImageView) findViewById(R.id.imgViewContactImage);
 
+        TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
         tabHost.setup();
 
         TabHost.TabSpec tabSpec = tabHost.newTabSpec("creator");
@@ -76,6 +80,23 @@ public class MainActivity extends ActionBarActivity {
 
             }
         });
+
+        contactImageImgView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select Contact Image"), 1);
+            }
+        });
+    }
+
+    public void onActivityResult(int reqCode, int resCode, Intent data) {
+        if (resCode == RESULT_OK) {
+            if (reqCode == 1)
+                contactImageImgView.setImageURI(data.getData());
+        }
     }
 
     private void populateList() {
