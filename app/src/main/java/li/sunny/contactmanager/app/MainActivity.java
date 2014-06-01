@@ -29,7 +29,8 @@ public class MainActivity extends ActionBarActivity {
     ImageView contactImageImgView;
     List<Contact> Contacts = new ArrayList<Contact>() ;
     ListView contactListView;
-    Uri imageUri = null;
+    Uri imageUri = Uri.parse("android.resource://li.sunny.contactmanager.app/drawable/identicon512");
+    DatabaseHandler dbHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +43,7 @@ public class MainActivity extends ActionBarActivity {
         addressTxt = (EditText) findViewById(R.id.txtAddress);
         contactListView = (ListView) findViewById(R.id.listView);
         contactImageImgView = (ImageView) findViewById(R.id.imgViewContactImage);
+        dbHandler = new DatabaseHandler(getApplicationContext());
 
         TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
         tabHost.setup();
@@ -60,9 +62,33 @@ public class MainActivity extends ActionBarActivity {
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Contacts.add(new Contact(nameTxt.getText().toString(), phoneTxt.getText().toString(), emailTxt.getText().toString(), addressTxt.getText().toString(), imageUri));
-                populateList();
-                Toast.makeText(getApplicationContext(), nameTxt.getText().toString() + " has been added to your Contacts!", Toast.LENGTH_SHORT).show();
+                Contact contact = new Contact(
+                        // might fail id constraint when some entries get deleted..
+                        dbHandler.getContactCount(),
+                        nameTxt.getText().toString(),
+                        phoneTxt.getText().toString(),
+                        emailTxt.getText().toString(),
+                        addressTxt.getText().toString(),
+                        imageUri
+                );
+
+                if (!contactExists(contact)) {
+                    dbHandler.createContact(contact);
+                    Contacts.add(contact);
+
+                    Toast.makeText(
+                            getApplicationContext(),
+                            nameTxt.getText().toString() + " has been added to your contacts!",
+                            Toast.LENGTH_SHORT
+                    ).show();
+                    return;
+                }
+
+                Toast.makeText(
+                        getApplicationContext(),
+                        nameTxt.getText().toString() + " is already in your contact list!",
+                        Toast.LENGTH_SHORT
+                ).show();
             }
         });
 
@@ -92,6 +118,22 @@ public class MainActivity extends ActionBarActivity {
                 startActivityForResult(Intent.createChooser(intent, "Select Contact Image"), 1);
             }
         });
+
+        // initialize contact list from database
+        if (dbHandler.getContactCount() != 0)
+            Contacts.addAll(dbHandler.getAllContacts());
+        populateList();
+    }
+
+    private boolean contactExists(Contact contact) {
+        String name = contact.getName();
+        int contactCount = Contacts.size();
+
+        for (int i = 0; i < contactCount; i++)
+            if (name.compareToIgnoreCase(Contacts.get(i).getName()) == 0)
+                return true;
+
+        return false;
     }
 
     public void onActivityResult(int reqCode, int resCode, Intent data) {
