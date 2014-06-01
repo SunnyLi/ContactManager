@@ -1,5 +1,6 @@
 package li.sunny.contactmanager.app;
 
+import android.net.Uri;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -28,6 +29,7 @@ public class MainActivity extends ActionBarActivity {
     ImageView contactImageImgView;
     List<Contact> Contacts = new ArrayList<Contact>() ;
     ListView contactListView;
+    Uri imageUri = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +60,7 @@ public class MainActivity extends ActionBarActivity {
         addBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                addContact(nameTxt.getText().toString(), phoneTxt.getText().toString(), emailTxt.getText().toString(), addressTxt.getText().toString());
+                Contacts.add(new Contact(nameTxt.getText().toString(), phoneTxt.getText().toString(), emailTxt.getText().toString(), addressTxt.getText().toString(), imageUri));
                 populateList();
                 Toast.makeText(getApplicationContext(), nameTxt.getText().toString() + " has been added to your Contacts!", Toast.LENGTH_SHORT).show();
             }
@@ -94,18 +96,16 @@ public class MainActivity extends ActionBarActivity {
 
     public void onActivityResult(int reqCode, int resCode, Intent data) {
         if (resCode == RESULT_OK) {
-            if (reqCode == 1)
+            if (reqCode == 1) {
+                imageUri = (Uri) data.getData();
                 contactImageImgView.setImageURI(data.getData());
+            }
         }
     }
 
     private void populateList() {
         ArrayAdapter<Contact> adapter = new ContactListAdapter();
         contactListView.setAdapter(adapter);
-    }
-
-    private void addContact(String name, String phone, String email, String address) {
-        Contacts.add(new Contact(name, phone, email, address));
     }
 
     private class ContactListAdapter extends ArrayAdapter<Contact> {
@@ -128,6 +128,8 @@ public class MainActivity extends ActionBarActivity {
             email.setText(currentContact.getEmail());
             TextView address = (TextView) view.findViewById(R.id.cAddress);
             address.setText(currentContact.getAddress());
+            ImageView ivContactImage = (ImageView) view.findViewById(R.id.ivContactImage);
+            ivContactImage.setImageURI(currentContact.getImageUri());
 
             return view;
         }
