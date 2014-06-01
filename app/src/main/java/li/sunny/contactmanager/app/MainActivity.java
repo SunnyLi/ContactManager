@@ -1,15 +1,20 @@
 package li.sunny.contactmanager.app;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,12 +30,18 @@ import java.util.List;
 
 public class MainActivity extends ActionBarActivity {
 
+    private static final int
+            EDIT = 0,
+            DELETE = 1;
+
     EditText nameTxt, phoneTxt, emailTxt, addressTxt;
     ImageView contactImageImgView;
     List<Contact> Contacts = new ArrayList<Contact>() ;
     ListView contactListView;
     Uri imageUri = Uri.parse("android.resource://li.sunny.contactmanager.app/drawable/identicon512");
     DatabaseHandler dbHandler;
+    int longClickedItemIndex;
+    ArrayAdapter<Contact> contactAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +55,15 @@ public class MainActivity extends ActionBarActivity {
         contactListView = (ListView) findViewById(R.id.listView);
         contactImageImgView = (ImageView) findViewById(R.id.imgViewContactImage);
         dbHandler = new DatabaseHandler(getApplicationContext());
+
+        registerForContextMenu(contactListView);
+        contactListView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
+                longClickedItemIndex = position;
+                return false;
+            }
+        });
 
         TabHost tabHost = (TabHost) findViewById(R.id.tabHost);
         tabHost.setup();
@@ -75,6 +95,7 @@ public class MainActivity extends ActionBarActivity {
                 if (!contactExists(contact)) {
                     dbHandler.createContact(contact);
                     Contacts.add(contact);
+                    contactAdapter.notifyDataSetChanged();
 
                     Toast.makeText(
                             getApplicationContext(),
@@ -113,8 +134,10 @@ public class MainActivity extends ActionBarActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+                // the following enables fetching file from other apps, but permission issues..
+                //intent.setAction(Intent.ACTION_GET_CONTENT);
                 intent.setType("image/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(Intent.createChooser(intent, "Select Contact Image"), 1);
             }
         });
@@ -123,6 +146,37 @@ public class MainActivity extends ActionBarActivity {
         if (dbHandler.getContactCount() != 0)
             Contacts.addAll(dbHandler.getAllContacts());
         populateList();
+    }
+
+    public void onCreateContextMenu(ContextMenu menu, View view, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, view, menuInfo);
+
+        // too lazy to find a new image
+        menu.setHeaderIcon(resizeIcon(getResources().getDrawable(R.drawable.identicon512)));
+        menu.setHeaderTitle("Contact Options");
+        menu.add(Menu.NONE, EDIT, Menu.NONE, "Edit Contact");
+        menu.add(Menu.NONE, DELETE, Menu.NONE, "Delete Contact");
+    }
+
+    private Drawable resizeIcon(Drawable image) {
+        Bitmap b = ((BitmapDrawable)image).getBitmap();
+        Bitmap bitmapResized = Bitmap.createScaledBitmap(b, 100, 100, false);
+        return new BitmapDrawable(getResources(), bitmapResized);
+    }
+
+    public boolean onContextItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case EDIT:
+                // TODO: implement edit action
+                break;
+            case DELETE:
+                dbHandler.deleteContact(Contacts.get(longClickedItemIndex));
+                Contacts.remove(longClickedItemIndex);
+                contactAdapter.notifyDataSetChanged();
+                break;
+        }
+
+        return super.onContextItemSelected(item);
     }
 
     private boolean contactExists(Contact contact) {
@@ -146,8 +200,8 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void populateList() {
-        ArrayAdapter<Contact> adapter = new ContactListAdapter();
-        contactListView.setAdapter(adapter);
+        contactAdapter = new ContactListAdapter();
+        contactListView.setAdapter(contactAdapter);
     }
 
     private class ContactListAdapter extends ArrayAdapter<Contact> {
